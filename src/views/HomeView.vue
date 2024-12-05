@@ -10,46 +10,45 @@ const notesList = ref([]);
 const isEditing = ref(false); 
 const currentNoteId = ref(null);
 
-const showToast = (severity, summary, detail) => {
-  toast.add({ severity, summary, detail, life: 3000 });
-};
-
 const saveNote = async (newTitle, newContent) => {
   if (newTitle && newContent) {
+    
     if (isEditing.value) {
       const { data, error } = await supabase
         .from('notes')
-        .update({ title: newTitle, content: newContent })
+        .update({ title: newTitle, content: newContent, updated_at: currentTime }) // Menambahkan updated_at
         .eq('id', currentNoteId.value);
 
       if (error) {
         console.error('Error updating note:', error.message);
-        showToast('error', 'Update Failed', error.message);
+
       } else {
         console.log('Note updated:', data);
         await loadNotes();
         resetForm();
-        showToast('success', 'Update Successful', 'The note has been updated.');
       }
-    } else {
+    } 
+
+    if (!isEditing.value) {
       const { data, error } = await supabase
         .from('notes')
-        .insert([{ title: newTitle, content: newContent }]);
-
+        .insert([{ title: newTitle, content: newContent, created_at: currentTime, updated_at: currentTime }]); // Menambahkan created_at dan updated_at
+      console.log(data, error);
       if (error) {
         console.error('Error inserting note:', error.message);
-        showToast('error', 'Insert Failed', error.message);
+        resetForm();
       } else {
         console.log('Note inserted:', data);
         await loadNotes();
         resetForm();
-        showToast('success', 'Insert Successful', 'The note has been added.');
       }
     }
-  } else {
+
+    } else {
     console.warn('Title and Content cannot be empty!');
-    showToast('warn', 'Warning', 'Title and Content cannot be empty!');
-  }
+    resetForm();
+    }
+    resetForm();
 };
 
 const loadNotes = async () => {
@@ -95,11 +94,12 @@ onMounted(loadNotes);
 <template>
   <NavbarComponent />
   
-  <div class="px-24">
+  <div class="md:px-24">
     <EditorComponent 
       :title="title" 
       :content="content" 
       :isEditing="isEditing" 
+      @add-noete="addNote"
       @save-note="saveNote"
       @reset-form="resetForm" 
     />
@@ -107,16 +107,18 @@ onMounted(loadNotes);
     <div class="mt-4">
       <h2 class="text-sm font-medium">Notes List</h2>
       <ul>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 md:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:gap-1 lg:gap-2">
           <li v-for="note in notesList" :key="note.id" class="border p-2 my-2 rounded bg-slate-50">
             <h3 class="font-bold text-gray-700">{{ note.title }}</h3>
             <p class="text-gray-600">{{ note.content }}</p>
             <div class="flex justify-between my-2">
+              
               <span class="text-gray-400 text-xs">
-                  Created: {{ new Date(note.created_at).toLocaleString('en-SG', { timeZone: 'Asia/Singapore' }) }} 
-                  <br />
-                  Updated: {{ new Date(note.updated_at).toLocaleString('en-SG', { timeZone: 'Asia/Singapore' }) }}
+                Created: {{ new Date(note.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
+              <br />
+                Updated: {{ new Date(note.updated_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} <!-- Menggunakan updated_at -->
               </span>
+
               <div>
                 <button @click="editNote(note)" class="px-2 py-1 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 mr-2">
                   <i class="pi pi-pencil"></i>

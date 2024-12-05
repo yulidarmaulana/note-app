@@ -13,7 +13,7 @@ const toggleDarkMode = () => {
 </script>
 
 <template>
-  <nav class="px-36 py-4">
+  <nav class="md:px-32 py-4">
     <div class="container mx-auto flex justify-between items-center">
       <RouterLink to="/" class="text-xl font-bold">Noty.</RouterLink>
       <button @click="toggleDarkMode" class="">

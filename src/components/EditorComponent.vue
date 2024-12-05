@@ -7,7 +7,7 @@ const props = defineProps({
   isEditing: Boolean,
 });
 
-const emit = defineEmits(['save-note', 'reset-form']);
+const emit = defineEmits(['save-note', 'resetForm']);
 
 const newTitle = ref(props.title);
 const newContent = ref(props.content);
@@ -16,12 +16,15 @@ const newContent = ref(props.content);
 watch(() => props.title, (newValue) => newTitle.value = newValue);
 watch(() => props.content, (newValue) => newContent.value = newValue);
 
+
+
 const save = () => {
   emit('save-note', newTitle.value, newContent.value);
+  this.$refs['refFormName'].resetFields();
 };
 
 const cancel = () => {
-  emit('reset-form');
+  emit('resetForm');
 };
 </script>
 
