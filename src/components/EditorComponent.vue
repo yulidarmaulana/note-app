@@ -1,30 +1,32 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from 'vue';
+import Editor from 'primevue/editor';
 
 const props = defineProps({
   title: String,
   content: String,
+  category: String,  
   isEditing: Boolean,
 });
 
-const emit = defineEmits(['save-note', 'resetForm']);
+const emit = defineEmits(['save-note', 'reset-form']);
 
 const newTitle = ref(props.title);
 const newContent = ref(props.content);
+const newCategory = ref(props.category); 
 
 // Watch for prop changes and update local refs
 watch(() => props.title, (newValue) => newTitle.value = newValue);
 watch(() => props.content, (newValue) => newContent.value = newValue);
-
-
+watch(() => props.category, (newValue) => newCategory.value = newValue);  // Watch category
 
 const save = () => {
-  emit('save-note', newTitle.value, newContent.value);
-  this.$refs['refFormName'].resetFields();
+  emit('save-note', newTitle.value, newContent.value, newCategory.value) // Include category in emit
+  emit('reset-form');
 };
 
 const cancel = () => {
-  emit('resetForm');
+  emit('reset-form');
 };
 </script>
 
@@ -40,6 +42,12 @@ const cancel = () => {
       placeholder="Content" 
       class="p-2 border border-gray-300 rounded mb-2 w-full"
     ></textarea>
+    <input 
+      v-model="newCategory"    
+      placeholder="Category"
+      class="p-2 border border-gray-300 rounded mb-2 w-full" 
+    />
+
     <div class="text-end">
       <button 
         @click="save" 
