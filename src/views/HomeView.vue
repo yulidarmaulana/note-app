@@ -16,7 +16,7 @@ const saveNote = async (newTitle, newContent, newCategory) => {
   if (newTitle && newContent) {
     if (isEditing.value) {
       const { data, error } = await supabase
-        .from('notes')
+        .from('notes') 
         .update({ title: newTitle, content: newContent, category: newCategory })
         .eq('id', currentNoteId.value);
 
@@ -40,8 +40,9 @@ const saveNote = async (newTitle, newContent, newCategory) => {
     }
   } else {
     console.warn('Title and Content cannot be empty!');
+    resetForm();
   }
-};
+}
 
 const loadNotes = async () => {
   const { data, error } = await supabase.from('notes').select('*');
@@ -89,6 +90,8 @@ const editNote = (note) => {
   isEditing.value = true;
 };
 
+onMounted(loadNotes);
+
 const resetForm = () => {
   title.value = '';
   content.value = '';
@@ -97,7 +100,6 @@ const resetForm = () => {
   currentNoteId.value = null;
 };
 
-onMounted(loadNotes);
 </script>
 
 <template>

@@ -1,6 +1,5 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from 'vue';
-import Editor from 'primevue/editor';
 
 const props = defineProps({
   title: String,
@@ -20,14 +19,20 @@ watch(() => props.title, (newValue) => newTitle.value = newValue);
 watch(() => props.content, (newValue) => newContent.value = newValue);
 watch(() => props.category, (newValue) => newCategory.value = newValue);  // Watch category
 
-const save = () => {
+const save = (e) => {
   emit('save-note', newTitle.value, newContent.value, newCategory.value) // Include category in emit
-  emit('reset-form');
 };
 
 const cancel = () => {
   emit('reset-form');
 };
+
+const resetForm = () => {
+  newTitle.value = '';
+  newContent.value = '';
+  newCategory.value = '';
+};
+
 </script>
 
 <template>
@@ -63,5 +68,6 @@ const cancel = () => {
         Cancel
       </button>
     </div>
+
   </div>
 </template>
