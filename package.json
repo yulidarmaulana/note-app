@@ -9,8 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@primevue/forms": "^4.2.2",
-    "@primevue/themes": "^4.1.1",
+    "@heroicons/vue": "^2.2.0",
     "@supabase/supabase-js": "^2.46.0",
     "primeicons": "^7.0.0",
     "primevue": "^4.1.1",

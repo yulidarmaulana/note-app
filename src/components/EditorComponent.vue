@@ -1,7 +1,7 @@
 <script setup>
 import { ref, defineProps, defineEmits, watch } from 'vue';
 
-const props = defineProps({
+const form = defineProps({
   title: String,
   content: String,
   category: String,  
@@ -10,17 +10,18 @@ const props = defineProps({
 
 const emit = defineEmits(['save-note', 'reset-form']);
 
-const newTitle = ref(props.title);
-const newContent = ref(props.content);
-const newCategory = ref(props.category); 
+const newTitle = ref(form.title);
+const newContent = ref(form.content);
+const newCategory = ref(form.category); 
 
 // Watch for prop changes and update local refs
-watch(() => props.title, (newValue) => newTitle.value = newValue);
-watch(() => props.content, (newValue) => newContent.value = newValue);
-watch(() => props.category, (newValue) => newCategory.value = newValue);  // Watch category
+watch(() => form.title, (newValue) => newTitle.value = newValue);
+watch(() => form.content, (newValue) => newContent.value = newValue);
+watch(() => form.category, (newValue) => newCategory.value = newValue);  // Watch category
 
 const save = (e) => {
   emit('save-note', newTitle.value, newContent.value, newCategory.value) // Include category in emit
+  resetForm();
 };
 
 const cancel = () => {
@@ -39,7 +40,7 @@ const resetForm = () => {
   <div>
     <input 
       v-model="newTitle" 
-      placeholder="Title" 
+      placeholder="Title"
       class="p-2 border border-gray-300 rounded mb-2 w-full" 
     />
     <textarea 
@@ -58,10 +59,10 @@ const resetForm = () => {
         @click="save" 
         class="px-3 py-2 bg-blue-500 text-white font-medium rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
       >
-        {{ props.isEditing ? 'Update' : 'Save' }}
+        {{ form.isEditing ? 'Update' : 'Save' }}
       </button>
       <button 
-        v-if="props.isEditing" 
+        v-if="form.isEditing" 
         @click="cancel" 
         class="ml-2 px-4 py-2 bg-gray-400 text-white rounded"
       >

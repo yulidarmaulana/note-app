@@ -102,8 +102,17 @@ const resetForm = () => {
 
 </script>
 
+
 <template>
-  <NavbarComponent />
+  <NavbarComponent>
+    <template v-slot:navbar>
+      <ul>
+        <li>
+          
+        </li>
+      </ul>
+    </template>
+  </NavbarComponent>
   
   <div class="md:px-24">
     <EditorComponent 
@@ -138,7 +147,7 @@ const resetForm = () => {
               <span class="text-gray-400 text-xs">
                 Created: {{ new Date(note.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
                 <br />
-                Updated: {{ new Date(note.updated_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }}
+                Updated: {{ new Date(note.updated_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
               </span>
 
               <div>

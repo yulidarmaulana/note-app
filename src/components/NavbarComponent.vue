@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import "primeicons/primeicons.css";
 
+
 const isDarkMode = ref(false);
 
 const toggleDarkMode = () => {
@@ -13,14 +14,15 @@ const toggleDarkMode = () => {
 </script>
 
 <template>
-  <nav class="md:px-32 py-4">
-    <div class="container mx-auto flex justify-between items-center">
-      <RouterLink to="/" class="text-xl font-bold">Noty.</RouterLink>
-      <button @click="toggleDarkMode" class="">
-        <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"></i>
-      </button>
-    </div>
-  </nav>
+    <nav class="md:px-32 py-4">
+      <div class="container mx-auto flex justify-between items-center">
+        <RouterLink to="/" class="text-xl font-bold">Noty.</RouterLink>
+        <slot name="navbar"></slot>
+        <button @click="toggleDarkMode" class="">
+          <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"></i>
+        </button>
+      </div>
+    </nav>
 </template>
 
 <style>
