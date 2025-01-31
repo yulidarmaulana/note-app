@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue';
 import NavbarComponent from '../components/NavbarComponent.vue';
 import EditorComponent from '../components/EditorComponent.vue';
+import DeleteDialog from '../components/DeleteDialog.vue';
 import supabase from '../services/supabase';
 
 const title = ref('');
@@ -104,17 +105,9 @@ const resetForm = () => {
 
 
 <template>
-  <NavbarComponent>
-    <template v-slot:navbar>
-      <ul>
-        <li>
-          
-        </li>
-      </ul>
-    </template>
-  </NavbarComponent>
+  <NavbarComponent />
   
-  <div class="md:px-24">
+  <div class="md:px-24 px-4 py-2">
     <EditorComponent 
       :title="title" 
       :content="content" 
@@ -139,10 +132,11 @@ const resetForm = () => {
       
       <ul>
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:gap-1 lg:gap-2">
+          
           <li v-for="note in notesList" :key="note.id" class="border p-2 my-2 rounded bg-slate-50">
-            <h3 class="font-bold text-gray-700">{{ note.title }}</h3>
-            <p class="text-gray-600">{{ note.content }}</p>
-            <p class="text-gray-400 text-xs">Category: {{ note.category }}</p>
+            <h3 class="font-bold text-gray-700 line-clamp-1">{{ note.title }}</h3>
+            <p class="text-gray-600 line-clamp-1">{{ note.content }}</p>
+            <p class="text-gray-400 text-xs my-2">Category: {{ note.category }}</p>
             <div class="flex justify-between my-2">
               <span class="text-gray-400 text-xs">
                 Created: {{ new Date(note.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
@@ -150,13 +144,19 @@ const resetForm = () => {
                 Updated: {{ new Date(note.updated_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
               </span>
 
-              <div>
+              <div class="flex items-center">
                 <button @click="editNote(note)" class="px-2 py-1 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 mr-2">
                   <i class="pi pi-pencil"></i>
                 </button>
-                <button @click="deleteNote(note.id)" class="px-2 py-1 bg-rose-500 text-white rounded-md hover:bg-rose-800">
-                  <i class="pi pi-trash"></i>
-                </button>
+
+                <DeleteDialog msg="Delete Note" title="Are you sure you want to delete this note?" description="This action cannot be undone.">
+                  <template v-slot:content>
+                    <button @click="deleteNote(note.id)" class="inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+                      Delete
+                    </button>
+                  </template>
+                </DeleteDialog>
+
               </div>
             </div>
           </li>

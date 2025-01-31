@@ -14,7 +14,7 @@ const toggleDarkMode = () => {
 </script>
 
 <template>
-    <nav class="md:px-32 py-4">
+    <nav class="md:px-32 py-4 px-4 top-0">
       <div class="container mx-auto flex justify-between items-center">
         <RouterLink to="/" class="text-xl font-bold">Noty.</RouterLink>
         <slot name="navbar"></slot>
@@ -31,4 +31,5 @@ const toggleDarkMode = () => {
   background-color: #1f2937;
   color: #fff;
 }
+
 </style>
