@@ -1,0 +1,179 @@
+<template>
+  <NavbarComponent>
+    <template v-slot:navbar>
+      <SearchComponent :notes="notesList" @filtered-notes="updateFilteredNotes" />
+    </template>
+  </NavbarComponent>
+
+  <div class="md:px-24 px-4 py-2">
+    <EditorComponent 
+      :title="title" 
+      :content="content" 
+      :category="category"  
+      :isEditing="isEditing" 
+      @save-note="saveNote"  
+      @reset-form="resetForm" 
+    />
+
+
+    <div class="mt-4">
+      <div class="flex justify-between">
+        <h2 class="text-lg font-medium">Notes List</h2>
+        <div class="flex items-center mb-2">
+          <button 
+            @click="toggleSortOrder" 
+            class="flex items-center rounded-md p-2 bg-gray-100 hover:bg-gray-300 text-gray-800">
+            <i :class="sortAscending ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" style="font-size: 0.6rem; font-weight: 800;"></i>
+            <span class="ml-1" style="font-size: 0.8rem;">{{ sortAscending ? 'Oldest' : 'Newest' }}</span>
+          </button>
+        </div>
+      </div>
+      
+      <ul>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 md:gap-1 lg:gap-2">
+          <li v-for="note in filteredNotes" :key="note.id" class="border p-2 my-2 rounded bg-slate-50">
+            <h3 class="font-bold text-gray-700 line-clamp-1">{{ note.title }}</h3>
+            <p class="text-gray-600 line-clamp-1">{{ note.content }}</p>
+            <p class="text-gray-400 text-xs my-2">Category: {{ note.category }}</p>
+            <div class="flex justify-between my-2">
+              <span class="text-gray-400 text-xs">
+                Created: {{ new Date(note.created_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
+                <br />
+                Updated: {{ new Date(note.updated_at).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', hour12: false }) }} 
+              </span>
+
+              <div class="flex items-center">
+                <button @click="editNote(note)" class="px-2 py-1 rounded-md bg-yellow-500 text-white hover:bg-yellow-600 mr-2">
+                  <i class="pi pi-pencil"></i>
+                </button>
+
+                <DeleteDialog msg="Delete Note" title="Are you sure you want to delete this note?" description="This action cannot be undone.">
+                  <template v-slot:content>
+                    <button @click="deleteNote(note.id)" class="inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+                      Delete
+                    </button>
+                  </template>
+                </DeleteDialog>
+              </div>
+            </div>
+          </li>
+        </div>
+      </ul>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import NavbarComponent from '../components/NavbarComponent.vue';
+import EditorComponent from '../components/EditorComponent.vue';
+import DeleteDialog from '../components/DeleteDialog.vue';
+import SearchComponent from '../components/SearchComponent.vue';
+import supabase from '../services/supabase';
+
+const title = ref('');
+const content = ref('');
+const category = ref('');
+const notesList = ref([]);
+const filteredNotes = ref([]);
+const isEditing = ref(false); 
+const currentNoteId = ref(null);
+const sortAscending = ref(true);  // State for sorting order
+
+const saveNote = async (newTitle, newContent, newCategory) => {
+  if (newTitle && newContent) {
+    if (isEditing.value) {
+      const { data, error } = await supabase
+        .from('notes') 
+        .update({ title: newTitle, content: newContent, category: newCategory })
+        .eq('id', currentNoteId.value);
+
+      if (error) {
+        console.error('Error updating note:', error.message);
+      } else {
+        await loadNotes();
+        resetForm();
+      }
+    } else {
+      const { data, error } = await supabase
+        .from('notes')
+        .insert([{ title: newTitle, content: newContent, category: newCategory }]);
+
+      if (error) {
+        console.error('Error inserting note:', error.message);
+      } else {
+        await loadNotes();
+        resetForm();
+      }
+    }
+  } else {
+    console.warn('Title and Content cannot be empty!');
+    resetForm();
+  }
+};
+
+const loadNotes = async () => {
+  const { data, error } = await supabase.from('notes').select('*');
+  if (error) {
+    console.error('Error loading notes:', error.message);
+  } else {
+    notesList.value = data;
+    filteredNotes.value = data; // Initialize filtered notes with all notes
+    sortNotes(); // Sort notes after loading
+  }
+};
+
+// Sort function based on date
+const sortNotes = () => {
+  filteredNotes.value.sort((a, b) => {
+    return sortAscending.value 
+      ? new Date(a.created_at) - new Date(b.created_at) // Ascending
+      : new Date(b.created_at) - new Date(a.created_at); // Descending
+  });
+};
+
+const toggleSortOrder = () => {
+  sortAscending.value = !sortAscending.value; // Toggle the order
+  sortNotes(); // Resort after toggling
+};
+
+const deleteNote = async (id) => {
+  const { data, error } = await supabase
+    .from('notes')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+    console.error('Error deleting note:', error.message);
+  } else {
+    console.log('Note deleted:', data);
+    await loadNotes();
+  }
+};
+
+const editNote = (note) => {
+  title.value = note.title;
+  content.value = note.content;
+  category.value = note.category; 
+  currentNoteId.value = note.id;
+  isEditing.value = true;
+};
+
+const updateFilteredNotes = (filtered) => {
+  filteredNotes.value = filtered; // Update filtered notes based on search
+};
+
+onMounted(loadNotes);
+
+const resetForm = () => {
+  title.value = '';
+  content.value = '';
+  category.value = ''; 
+  isEditing.value = false;
+  currentNoteId.value = null;
+};
+</script>
+
+<style scoped>
+/* Optional: Add any additional styles here */
+</style>

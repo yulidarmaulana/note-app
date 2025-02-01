@@ -1,4 +1,4 @@
 // views/index.js
-export { default as HomeView } from "./HomeView.vue";
-export { default as AboutView } from "./AboutView.vue";
-export { default as ErrorView } from "./ErrorView.vue";
+export { default as HomePage } from "./HomePage.vue";
+export { default as AboutPage } from "./AboutPage.vue";
+export { default as ErrorPage } from "./ErrorPage.vue";

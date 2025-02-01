@@ -14,10 +14,11 @@ const toggleDarkMode = () => {
 </script>
 
 <template>
-    <nav class="md:px-32 py-4 px-4 top-0">
-      <div class="container mx-auto flex justify-between items-center">
+    <nav class="md:px-32 py-4 px-4 top-0 sticky">
+      <div class="container mx-auto flex justify-between items-center gap-4">
         <RouterLink to="/" class="text-xl font-bold">Noty.</RouterLink>
         <slot name="navbar"></slot>
+
         <button @click="toggleDarkMode" class="">
           <i :class="isDarkMode ? 'pi pi-sun' : 'pi pi-moon'"></i>
         </button>

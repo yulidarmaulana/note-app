@@ -1,18 +1,18 @@
 import { createWebHistory, createRouter } from "vue-router";
-import { HomeView, AboutView, ErrorView } from "../pages";
+import { HomePage, AboutPage, ErrorPage } from "../pages";
 
 const routes = [
   {
     path: "/",
-    component: HomeView,
+    component: HomePage,
   },
   {
     path: "/about",
-    component: AboutView,    
+    component: AboutPage,    
   },
   {
     path: "/:catchAll(.*)",
-    component: ErrorView,
+    component: ErrorPage,
   }
 ];
 
